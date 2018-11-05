@@ -72,6 +72,11 @@ Ec2MultiRegionSnitch
     public IP as well). You will need to open the ``storage_port`` or ``ssl_storage_port`` on the public IP firewall
     (For intra-Region traffic, Cassandra will switch to the private IP after establishing a connection).
 
+AzureSnitch
+    Appropriate for Microsoft Azure deployments in a single Region. Loads Region and Availability Zone information from the
+    Instance Metadata API. As with the Ec2Snitch, the Region is treated as the datacenter, and the Availability Zone as the rack.
+    Only private IPs are used, so this will not work across multiple regions.
+
 RackInferringSnitch
     Proximity is determined by rack and data center, which are assumed to correspond to the 3rd and 2nd octet of each
     node's IP address, respectively.  Unless this happens to match your deployment conventions, this is best used as an
