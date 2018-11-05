@@ -47,7 +47,7 @@ public class AzureSnitch extends AbstractNetworkTopologySnitch
 {
     protected static final Logger logger = LoggerFactory.getLogger(AzureSnitch.class);
 
-    protected static final String AZURE_QUERY_URL_TEMPLATE = "http://169.254.169.254/metadata/instance/compute/(%s)?api-version=2018-04-02&format=text";
+    protected static final String AZURE_QUERY_URL_TEMPLATE = "http://169.254.169.254/metadata/instance/compute/%s?api-version=2018-04-02&format=text";
     protected static final String REGION_NAME_QUERY_URL = String.format(AZURE_QUERY_URL_TEMPLATE, "location");
     protected static final String ZONE_NAME_QUERY_URL = String.format(AZURE_QUERY_URL_TEMPLATE, "zone");
     private static final String DEFAULT_DC = "UNKNOWN-DC";
