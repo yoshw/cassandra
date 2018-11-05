@@ -24,13 +24,15 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.cassandra.db.SystemKeyspace;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.cassandra.gms.ApplicationState;
@@ -196,15 +198,22 @@ public class AzureSnitch extends AbstractNetworkTopologySnitch
         return true;
     }
 
-    private Set<String> parseLocationsFromEndpointMetadata(String endpointMetadataRaw) {
-        Map<String, String> endpointMetadata = FBUtilities.fromJsonMap(endpointMetadataRaw);
-        Map<String, String> allCloudEndpoints = FBUtilities.fromJsonMap(endpointMetadata.get("cloudEndpoint"));
+    private Set<String> parseLocationsFromEndpointMetadata(String endpointMetadataRaw) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode endpointMetadata = mapper.readTree(endpointMetadataRaw);
+
+        JsonNode allCloudEndpoints = endpointMetadata.get("cloudEndpoint");
 
         Set<String> locations = new HashSet<>();
-        for (String endpoint : allCloudEndpoints.keySet()) {
-            Map<String, String> endpointDetails = FBUtilities.fromJsonMap(endpoint);
-            List<String> endpointLocations = FBUtilities.fromJsonList(endpointDetails.get("locations"));
-            locations.addAll(endpointLocations);
+        Iterator<Map.Entry<String, JsonNode>> fieldIter = allCloudEndpoints.fields();
+        while (fieldIter.hasNext()) {
+            JsonNode endpointDetails = fieldIter.next().getValue();
+            JsonNode endpointLocations = endpointDetails.get("locations");
+            if (endpointLocations.isArray()) {
+                for (final JsonNode locNode : endpointLocations) {
+                    locations.add(locNode.textValue());
+                }
+            }
         }
         return locations;
     }
