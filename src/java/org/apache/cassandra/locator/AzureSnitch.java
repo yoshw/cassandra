@@ -149,7 +149,9 @@ public class AzureSnitch extends AbstractNetworkTopologySnitch
         }
         catch (IOException | ConfigurationException e)
         {
-            logger.warn(e.getMessage());
+            // we make a best effort to get valid locations from the Azure management endpoint,
+            // but if that call fails, we can still perform basic validation
+            logger.info(e.getMessage());
             locations = new HashSet<>();
         }
 

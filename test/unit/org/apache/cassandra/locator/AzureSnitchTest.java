@@ -18,7 +18,6 @@
 
 package org.apache.cassandra.locator;
 
-
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
@@ -76,12 +75,8 @@ public class AzureSnitchTest
             } else if (url.contains("metadata/endpoints")) {
                 // subset of actual endpoint metadata (as of Nov 2018)
                 return "{\"cloudEndpoint\":{"
-                       + "\"public\":{\"endpoint\":\"management.azure.com\",\"locations\":[\"westus\",\"westus2\",\"eastus\",\"centralus\",\"centraluseuap\",\"southcentralus\",\"northcentralus\",\"westcentralus\",\"eastus2\",\"eastus2euap\","
-                       + "\"brazilsouth\",\"brazilus\",\"northeurope\",\"westeurope\",\"eastasia\",\"southeastasia\",\"japanwest\",\"japaneast\",\"koreacentral\",\"koreasouth\",\"indiasouth\",\"indiawest\",\"indiacentral\","
-                       + "\"australiaeast\",\"australiasoutheast\",\"canadacentral\",\"canadaeast\",\"uknorth\",\"uksouth2\",\"uksouth\",\"ukwest\",\"francecentral\",\"francesouth\",\"australiacentral\",\"australiacentral2\"]},"
-                       + "\"chinaCloud\":{\"endpoint\":\"management.chinacloudapi.cn\",\"locations\":[\"chinaeast\",\"chinanorth\",\"chinanorth2\",\"chinaeast2\"]},"
-                       + "\"usGovCloud\":{\"endpoint\":\"management.usgovcloudapi.net\",\"locations\":[\"usgovvirginia\",\"usgoviowa\",\"usdodeast\",\"usdodcentral\",\"usgovtexas\",\"usgovarizona\"]},"
-                       + "\"germanCloud\":{\"endpoint\":\"management.microsoftazure.de\",\"locations\":[\"germanycentral\",\"germanynortheast\"]}}}";
+                       + "\"public\":{\"endpoint\":\"management.azure.com\",\"locations\":[\"westus\",\"eastus2\"]},"
+                       + "\"usGovCloud\":{\"endpoint\":\"management.usgovcloudapi.net\",\"locations\":[\"usgovvirginia\"]}}}";
             }
             return "";
         }
@@ -142,6 +137,8 @@ public class AzureSnitchTest
         AzureSnitch snitch = getSnitchForValidation();
         Set<String> datacenters = new HashSet<>();
         datacenters.add("eastus2");
+        datacenters.add("westus");
+        datacenters.add("usgovvirginia");
         Set<String> racks = new HashSet<>();
         racks.add("1");
         Assert.assertTrue(snitch.validate(datacenters, racks));
@@ -156,6 +153,15 @@ public class AzureSnitchTest
         Set<String> racks = new HashSet<>();
         racks.add("1");
         Assert.assertTrue(snitch.validate(datacenters, racks));
+    }
+
+    @Test
+    public void validate_UnhappyPath() throws IOException, ConfigurationException
+    {
+        AzureSnitch snitch = getSnitchForValidation();
+        Set<String> datacenters = new HashSet<>();
+        datacenters.add("fakeregion");
+        Assert.assertFalse(snitch.validate(datacenters, Collections.emptySet()));
     }
 
     @AfterClass
