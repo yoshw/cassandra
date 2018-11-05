@@ -154,7 +154,7 @@ public class AzureSnitch extends AbstractNetworkTopologySnitch
         return validate(datacenters, racks, locations);
     }
 
-    boolean validate(Set<String> datacenters, Set<String> racks, Set<String> locations)
+    private boolean validate(Set<String> datacenters, Set<String> racks, Set<String> locations)
     {
         // At this time, there does not seem to be any formal specification of what constitutes a valid
         // Azure region name, but by inspection, their structure appears to be very straightforward.
@@ -196,7 +196,7 @@ public class AzureSnitch extends AbstractNetworkTopologySnitch
         return true;
     }
 
-    Set<String> parseLocationsFromEndpointMetadata(String endpointMetadataRaw) {
+    private Set<String> parseLocationsFromEndpointMetadata(String endpointMetadataRaw) {
         Map<String, String> endpointMetadata = FBUtilities.fromJsonMap(endpointMetadataRaw);
         Map<String, String> allCloudEndpoints = FBUtilities.fromJsonMap(endpointMetadata.get("cloudEndpoint"));
 
